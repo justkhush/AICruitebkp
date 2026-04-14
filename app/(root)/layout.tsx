@@ -7,8 +7,8 @@ import { isAuthenticated } from "@/lib/actions/auth.action";
 
 const Layout = async ({ children }: { children: ReactNode }) => {
   const isUserAuthenticated = await isAuthenticated();
-  // TEMP: disable strict auth check
-  // if (!isUserAuthenticated) redirect("/sign-in");
+  // Check strict auth
+  if (!isUserAuthenticated) redirect("/sign-in");
 
   return (
     <div className="root-layout">

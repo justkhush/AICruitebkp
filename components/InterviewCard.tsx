@@ -51,12 +51,28 @@ const InterviewCard = async ({ id, userId,role,type,techstack,createdAt}: Interv
         <div className='flex flex-row justify-between'>       
           <DisplayTechIcons techStack={techstack}/>
 
-          <Button className='btn-primary'>
-            <Link href={feedback ? `/interview/${id}/feedback`
-            :`/interview/${id}`}>
-              {feedback ? 'Check Feedback' :'View interview'}
-            </Link>
-          </Button>
+          <div className='flex flex-row gap-2'>
+            {feedback ? (
+              <>
+                <Button asChild className='btn-secondary'>
+                  <Link href={`/interview/${id}`}>
+                    Retake
+                  </Link>
+                </Button>
+                <Button asChild className='btn-primary'>
+                  <Link href={`/interview/${id}/feedback`}>
+                    Feedback
+                  </Link>
+                </Button>
+              </>
+            ) : (
+              <Button asChild className='btn-primary'>
+                <Link href={`/interview/${id}`}>
+                  View interview
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>

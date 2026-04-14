@@ -13,16 +13,34 @@ import { getCurrentUser } from "@/lib/actions/auth.action";
 const Feedback = async ({ params }: RouteParams) => {
   const { id } = await params;
   const user = await getCurrentUser();
+  const userId = user?.id ?? null;
 
   const interview = await getInterviewById(id);
   if (!interview) redirect("/");
 
-  const feedback = await getFeedbackByInterviewId({
-    interviewId: id,
-    userId: user?.id!,
-  });
+  const feedback = userId
+    ? await getFeedbackByInterviewId({ interviewId: id, userId })
+    : null;
 
-  if (!feedback) redirect("/");
+  if (!feedback) {
+    return (
+      <section className="section-feedback flex flex-col items-center justify-center gap-6 py-20">
+        <h1 className="text-2xl font-semibold text-center">Feedback Not Ready Yet</h1>
+        <p className="text-gray-400 text-center max-w-md">
+          Your feedback is still being generated. Please wait a moment and refresh
+          the page, or return to your dashboard.
+        </p>
+        <div className="flex gap-4">
+          <Button asChild className="btn-secondary">
+            <Link href="/">Back to Dashboard</Link>
+          </Button>
+          <Button asChild className="btn-primary">
+            <Link href={`/interview/${id}/feedback`}>Refresh Feedback</Link>
+          </Button>
+        </div>
+      </section>
+    );
+  }
 
   // Normalize categoryScores: Groq returns a plain object { communication: 80 }
   // but the old schema typed it as an array. Handle both safely.
@@ -145,19 +163,16 @@ const Feedback = async ({ params }: RouteParams) => {
 
       {/* Action Buttons */}
       <div className="buttons">
-        <Button className="btn-secondary flex-1">
-          <Link href="/" className="flex w-full justify-center">
+        <Button asChild className="btn-secondary flex-1">
+          <Link href="/">
             <p className="text-sm font-semibold text-primary-200 text-center">
               Back to Dashboard
             </p>
           </Link>
         </Button>
 
-        <Button className="btn-primary flex-1">
-          <Link
-            href={`/interview/${id}`}
-            className="flex w-full justify-center"
-          >
+        <Button asChild className="btn-primary flex-1">
+          <Link href={`/interview/${id}`}>
             <p className="text-sm font-semibold text-black text-center">
               Retake Interview
             </p>

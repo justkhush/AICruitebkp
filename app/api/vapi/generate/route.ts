@@ -1,5 +1,7 @@
 import { generateText } from "ai";
 import { groq } from "@ai-sdk/groq";
+import { revalidatePath } from "next/cache";
+
 
 import { db } from "@/firebase/admin";
 import { getRandomInterviewCover } from "@/lib/utils";
@@ -134,11 +136,13 @@ Avoid special characters like / * etc.
     const docRef = await db.collection("interviews").add(interview);
     console.log("Interview created:", docRef.id);
 
+    revalidatePath("/");
+
     return Response.json({ success: true, interviewId: docRef.id });
   } catch (error) {
     console.error("API ERROR:", error);
     return Response.json(
-      { success: false, error: "Failed to create interview" },
+      { success: false, error: error instanceof Error ? error.message : "Failed to create interview" },
       { status: 500 }
     );
   }

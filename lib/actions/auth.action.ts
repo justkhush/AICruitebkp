@@ -113,7 +113,15 @@ export async function getCurrentUser(): Promise<User | null> {
       .doc(decodedClaims.uid)
       .get();
 
-    if (!userRecord.exists) return null;
+    // If the user authenticated successfully with Firebase but their Firestore document is 
+    // missing (sync error during sign-up or manual creation), STILL return their identity!
+    if (!userRecord.exists) {
+      return {
+        id: decodedClaims.uid,
+        name: decodedClaims.name || "User",
+        email: decodedClaims.email || "",
+      } as User;
+    }
 
     return {
       ...userRecord.data(),
